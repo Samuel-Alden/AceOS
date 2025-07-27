@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>My Desktop</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="desktop">
+            <div class="desktop-icon" id="bio-icon">
+                <img src="images/windows-app.jpeg" alt="Bio Icon" />
+                <span>My Bio</span>
+            </div>
+            <div class="desktop-icon" id="media-icon" style="left: 100px;">
+                <img src="https://icons.iconarchive.com/icons/dtafalonso/win-98/32/CD-Audio-icon.png" alt="Media Icon" />
+                <span>Media</span>
+            </div>
+           <div class="window" id="bio-window">
+            <div class="window" id="media-window">
+                <div class="title-bar">
+                    <span class="title">Media Player</span>
+                    <div class="window-buttons">
+                        <button class="minimize">-</button>
+                        <button class="close">x</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <audio id="audio-player" controls>
+                        <source src="spotify.com" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+            <div class="title-bar">
+                <span class="title">My Bio</span>
+                <div class="window-buttons">
+                    <button class="minimize">-</button>
+                    <button class="close">x</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <p>Hello, I'm Alden!</p>
+                <p>This is where my biodata will go.</p>
+            </div>
+           </div>
+        </div>
+
+        <div id="taskbar">
+            <div id="start-button">Start</div>
+            <div id="start-menu" class="hidden">
+                <ul>
+                    <li>About Me</li>
+                    <li>Contact<li>
+                    <li>Fun Stuff</li>
+                    <li>Media</li>
+                    <li>Settings</li>
+                    <li>Shut Down</li>
+                </ul>
+            </div>
+            <div id="taskbar-apps"></div>
+            <div id="taskbar-clock"></div>
+        </div>
+                <script src="script.js"></script>
+    </body>
+</html>
