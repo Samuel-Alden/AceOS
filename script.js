@@ -1,95 +1,149 @@
-const windowEl = document.getElementById("bio-window");
-const titleBar = windowEl.querySelector(".title-bar");
-const closeBtn = windowEl.querySelector(".close");
-const minimizeBtn = windowEl.querySelector(".minimize");
-const bioIcon = document.getElementById("bio-icon");
+document.addEventListener("DOMContentLoaded", () => {
+    const windows = document.querySelectorAll(".window");
+    const icons = document.querySelectorAll(".desktop-icon");
+    const taskbar = document.getElementById("taskbar");
+    const taskbarClock = document.getElementById("taskbar-clock");
+    const startButton = document.getElementById("start-button");
+    const startMenu = document.getElementById("start-menu");
+    const taskbarButtons = {};
 
-const startBtn = document.getElementById("start-button");
-const startMenu = document.getElementById("start-menu");
+    // 🕒 Update Clock
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        taskbarClock.textContent = timeString;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
 
-const clockEl = document.getElementById("taskbar-clock");
-const taskbarApps = document.getElementById("taskbar-apps");
+    // 🪟 Make Windows Draggable
+    windows.forEach(win => {
+        const titleBar = win.querySelector('.title-bar');
+        let offsetX, offsetY, isDragging = false;
 
-let bioTaskbarBtn = null;
+        titleBar.addEventListener("mousedown", e => {
+            isDragging = true;
+            offsetX = e.clientX - win.offsetLeft;
+            offsetY = e.clientY - win.offsetTop;
+            win.style.zIndex = 1000;
+        });
 
-function updateClock() {
-  const now = new Date();
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  clockEl.textContent = `${hours}:${minutes}`;
-}
-setInterval(updateClock, 1000);
-updateClock();
+        document.addEventListener("mousemove", e => {
+            if (isDragging) {
+                win.style.left = `${e.clientX - offsetX}px`;
+                win.style.top = `${e.clientY - offsetY}px`;
+            }
+        });
 
-let isDragging = false;
-let offsetX = 0;
-let offsetY = 0;
-
-titleBar.addEventListener("mousedown", (e) => {
-  isDragging = true;
-  offsetX = e.clientX - windowEl.offsetLeft;
-  offsetY = e.clientY - windowEl.offsetTop;
-});
-
-document.addEventListener("mousemove", (e) => {
-  if (isDragging) {
-    windowEl.style.left = `${e.clientX - offsetX}px`;
-    windowEl.style.top = `${e.clientY - offsetY}px`;
-  }
-});
-
-document.addEventListener("mouseup", () => {
-  isDragging = false;
-});
-
-bioIcon.addEventListener("dblclick", () => {
-  windowEl.style.display = "block";
-  windowEl.style.zIndex = Date.now();
-
-  if (!bioTaskbarBtn) {
-    bioTaskbarBtn = document.createElement("div");
-    bioTaskbarBtn.className = "taskbar-app active";
-    bioTaskbarBtn.textContent = "My Bio";
-    taskbarApps.appendChild(bioTaskbarBtn);
-
-    bioTaskbarBtn.addEventListener("click", () => {
-      if (windowEl.style.display === "none") {
-        windowEl.style.display = "block";
-        windowEl.style.zIndex = Date.now();
-        bioTaskbarBtn.classList.add("active");
-      } else {
-        windowEl.style.display = "none";
-        bioTaskbarBtn.classList.remove("active");
-      }
+        document.addEventListener("mouseup", () => {
+            isDragging = false;
+        });
     });
-  } else {
-    bioTaskbarBtn.classList.add("active");
-  }
-});
 
-closeBtn.addEventListener("click", () => {
-  windowEl.style.display = "none";
-  if (bioTaskbarBtn) {
-    bioTaskbarBtn.remove();
-    bioTaskbarBtn = null;
-  }
-});
+    // 📂 Desktop Icons to Open Windows
+    icons.forEach(icon => {
+        icon.addEventListener("dblclick", () => {
+            const windowId = icon.id.replace("-icon", "-window");
+            const win = document.getElementById(windowId);
+            if (win) {
+                win.style.display = "block";
+                win.style.zIndex = 1000;
 
-minimizeBtn.addEventListener("click", () => {
-  windowEl.style.display = "none";
-  if (bioTaskbarBtn) bioTaskbarBtn.classList.remove("active");
-});
+                if (!taskbarButtons[windowId]) {
+                    const btn = document.createElement("button");
+                    btn.className = "taskbar-app-button";
+                    btn.textContent = win.querySelector(".title").textContent;
 
-windowEl.style.display = "none";
+                    btn.addEventListener("click", () => {
+                        win.style.display = win.style.display === "none" ? "block" : "none";
+                    });
 
-startBtn.addEventListener("click", () => {
-  const isVisible = !startMenu.classList.contains("hidden");
-  document.querySelectorAll("#start-menu").forEach(menu => menu.classList.add("hidden"));
-  if (!isVisible) startMenu.classList.remove("hidden");
-})
+                    taskbar.insertBefore(btn, taskbarClock);
+                    taskbarButtons[windowId] = btn;
+                }
+            }
+        });
+    });
 
-document.addEventListener("click", (e) => {
-  if (!startBtn.contains(e.target) && !startMenu.contains(e.target)) {
-    startMenu.classList.add("hidden");
-  }
+    // ❌ Close & ➖ Minimize Windows
+    windows.forEach(win => {
+        const closeBtn = win.querySelector(".close");
+        const minBtn = win.querySelector(".minimize");
+        const windowId = win.id;
+
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => {
+                win.style.display = "none";
+                if (taskbarButtons[windowId]) {
+                    taskbarButtons[windowId].remove();
+                    delete taskbarButtons[windowId];
+                }
+            });
+        }
+
+        if (minBtn) {
+            minBtn.addEventListener("click", () => {
+                win.style.display = "none";
+            });
+        }
+    });
+
+    // 🎵 Music Player Logic
+    const audio = document.getElementById("music-audio");
+    const playBtn = document.getElementById("play-music");
+    const pauseBtn = document.getElementById("pause-music");
+    const nextBtn = document.getElementById("next-music");
+    const prevBtn = document.getElementById("prev-music");
+    const songTitle = document.getElementById("song-title");
+
+    const playlist = [
+        { title: "Track 1 - Cool Vibes", src: "music/song1.mp3" },
+        { title: "Track 2 - Dreamy Tune", src: "music/song2.mp3" },
+        { title: "Track 3 - Y2K Jam", src: "music/song3.mp3" }
+    ];
+
+    let currentTrack = 0;
+
+    function loadTrack(index) {
+        if (!audio) return;
+        const track = playlist[index];
+        audio.src = track.src;
+        if (songTitle) songTitle.textContent = track.title;
+    }
+
+    if (audio) {
+        loadTrack(currentTrack);
+
+        audio.addEventListener("ended", () => {
+            currentTrack = (currentTrack + 1) % playlist.length;
+            loadTrack(currentTrack);
+            audio.play();
+        });
+
+        if (playBtn) playBtn.addEventListener("click", () => audio.play());
+        if (pauseBtn) pauseBtn.addEventListener("click", () => audio.pause());
+        if (nextBtn) nextBtn.addEventListener("click", () => {
+            currentTrack = (currentTrack + 1) % playlist.length;
+            loadTrack(currentTrack);
+            audio.play();
+        });
+        if (prevBtn) prevBtn.addEventListener("click", () => {
+            currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
+            loadTrack(currentTrack);
+            audio.play();
+        });
+    }
+
+    // 🟦 Start Menu Toggle
+    if (startButton && startMenu) {
+        startButton.addEventListener("click", () => {
+            startMenu.style.display = startMenu.style.display === "block" ? "none" : "block";
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!startButton.contains(e.target) && !startMenu.contains(e.target)) {
+                startMenu.style.display = "none";
+            }
+        });
+    }
 });
