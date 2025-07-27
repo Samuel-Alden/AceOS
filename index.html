@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>My Desktop</title>
+        <link rel="stylesheet" href="style.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div id="desktop">
+            <div class="desktop-icon" id="media-icon">
+  <h1>🎵</h1>
+  <span>Music</span>
+</div>
+            <div class="desktop-icon" id="bio-icon">
+                <h1>👋</h1>
+                <span>My Bio</span>
+            </div>
+           <div class="window" id="bio-window">
+            <div class="title-bar">
+                <span class="title">My Bio</span>
+                <div class="window-buttons">
+                    <button class="minimize">-</button>
+                    <button class="close">x</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <p>Hello, I'm Alden!</p>
+                <p>This is where my biodata will go.</p>
+            </div>
+           </div>
+        </div>
+
+        <div id="taskbar">
+            <div id="start-button">Start</div>
+            <div id="start-menu" class="hidden">
+  <ul>
+    <li>🧑‍💻 My Bio</li>
+    <li id="start-music-btn">🎵 Music Player</li>
+    <li>📨 Contact</li>
+    <li>🔒 Log Off</li>
+  </ul>
+</div>
+            <div id="taskbar-apps"></div>
+            <div id="taskbar-clock"></div>
+        </div>
+
+        <div class="window" id="music-window">
+  <div class="title-bar">
+    <span class="title">Music Player</span>
+    <div class="window-buttons">
+      <button class="minimize">-</button>
+      <button class="close">x</button>
+    </div>
+  </div>
+  <div class="window-content">
+  <p id="song-title">HUNTRIX - GOLDEN</p>
+  <audio id="music-audio" src="audio/HUNTRIX - GOLDEN.mp3"></audio>
+  <div class="controls">
+    <button id="prev-music">⏮️</button>
+    <button id="play-music">▶️</button>
+    <button id="pause-music">⏸️</button>
+    <button id="next-music">⏭️</button>
+  </div>
+</div>
+<script src="script.js"></script>
+    </body>
+</html> 

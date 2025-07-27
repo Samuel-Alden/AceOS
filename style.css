@@ -1,0 +1,196 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    margin: 0;
+    font-family: 'Press Start 2P', 'MS Sans Serif', sans-serif;
+    background: linear-gradient(135deg, #d3d3f7, #fbefff); /* Y2K pastel vibes */
+    color: #000;
+    overflow: hidden;
+    user-select: none;
+    cursor: default;
+}
+
+#desktop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 40px;
+  background-image: url('images/retro-wallpaper.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 16px;
+}
+
+.window {
+  position: absolute;
+  width: 300px;
+  background-color: #e0e0e0;
+  border: 2px outset white;
+  box-shadow: 3px 3px #999;
+  font-family: 'MS Sans Serif', sans-serif;
+  z-index: 50;
+}
+
+.title-bar {
+  background-color: #000080;
+  color: white;
+  padding: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.window-buttons button {
+  background-color: #c0c0c0;
+  border: 1px outset white;
+  margin-left: 2px;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.window-content {
+  padding: 10px;
+  background-color: #f5f5f5;
+}
+
+audio {
+  width: 100%;
+  margin-top: 8px;
+  filter: contrast(120%) brightness(90%);
+}
+
+.desktop-icon {
+  width: 72px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.desktop-icon img {
+  width: 48px;
+  height: 48px;
+}
+
+.desktop-icon span {
+  font-size: 10px;
+  margin-top: 4px;
+  display: block;
+  color: white;
+  text-shadow: 1px 1px black;
+}
+
+.desktop-icon:hover span {
+  background-color: rgba(0, 120, 215, 0.4);
+  border: 1px dotted white;
+}
+
+#taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 40px;
+    width: 100%;
+    background: linear-gradient(#c0c0c0, #808080);
+    border-top: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    font-size: 14px;
+    font-family: 'Verdana', sans-serif;
+    z-index: 100;
+}
+
+#start-button {
+  background-color: silver;
+  border: 2px outset white;
+  padding: 4px 12px;
+  font-weight: bold;
+  font-family: 'Press Start 2P', 'MS Sans Serif', sans-serif;
+  cursor: pointer;
+}
+
+#start-button:hover {
+    background: linear-gradient(#d0d0d0, #a0a0a0);
+}
+
+#taskbar-clock {
+    background: #000;
+    color: #0f0;
+    padding: 4px 8px;
+    font-family: monospace;
+    border: 2px inset #444;
+}
+
+#taskbar-apps {
+    display: flex;
+    flex-grow: 1;
+    padding: 0 10px;
+    align-items: center;
+}
+
+.taskbar-app {
+  padding: 4px 8px;
+  background-color: #c0c0c0;
+  border: 2px outset white;
+  margin-right: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: 'MS Sans Serif', sans-serif;
+}
+
+.taskbar-app:hover {
+  background-color: #a0a0a0;
+  border: 2px inset #fff;
+}
+
+.taskbar-app.active {
+    background: #a0a0a0;
+    border-style: inset;
+}
+
+#start-menu {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  width: 200px;
+  background-color: #e0e0e0;
+  border: 2px outset white;
+  font-size: 12px;
+  font-family: 'MS Sans Serif', sans-serif;
+  box-shadow: 2px 2px 0 gray;
+  z-index: 100;
+}
+
+#start-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#start-menu li {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+}
+
+#start-menu li:hover {
+  background-color: #000080;
+  color: white;
+}
+
+.hidden {
+    display: none;
+}
