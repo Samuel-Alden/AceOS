@@ -1,147 +1,95 @@
-ldocument.addEventListener("DOMContentLoaded", () => {
-    const icons = document.querySelectorAll(".desktop-icon");
-    const windows = document.querySelectorAll(".window");
-    const taskbar = document.getElementById("taskbar");
-    const clock = document.getElementById("taskbar-clock");
-    const startButton = document.getElementById("start-button");
-    const startMenu = document.getElementById("start-menu");
-    const taskbarButtons = {};
+const windowEl = document.getElementById("bio-window");
+const titleBar = windowEl.querySelector(".title-bar");
+const closeBtn = windowEl.querySelector(".close");
+const minimizeBtn = windowEl.querySelector(".minimize");
+const bioIcon = document.getElementById("bio-icon");
 
-    // Update clock every second
-    function updateClock() {
-        const now = new Date();
-        clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+const startBtn = document.getElementById("start-button");
+const startMenu = document.getElementById("start-menu");
 
-    // Open windows when icon is double clicked
-    icons.forEach(icon => {
-        icon.addEventListener("dblclick", () => {
-            const windowId = icon.id.replace("-icon", "-window");
-            const win = document.getElementById(windowId);
-            if (win) {
-                win.style.display = "block";
-                win.style.zIndex = 1000;
+const clockEl = document.getElementById("taskbar-clock");
+const taskbarApps = document.getElementById("taskbar-apps");
 
-                if (!taskbarButtons[windowId]) {
-                    const btn = document.createElement("button");
-                    btn.className = "taskbar-app-button";
-                    btn.textContent = win.querySelector(".title").textContent;
+let bioTaskbarBtn = null;
 
-                    btn.addEventListener("click", () => {
-                        win.style.display = win.style.display === "none" ? "block" : "none";
-                    });
+function updateClock() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  clockEl.textContent = `${hours}:${minutes}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
 
-                    taskbar.insertBefore(btn, clock);
-                    taskbarButtons[windowId] = btn;
-                }
-            }
-        });
+let isDragging = false;
+let offsetX = 0;
+let offsetY = 0;
+
+titleBar.addEventListener("mousedown", (e) => {
+  isDragging = true;
+  offsetX = e.clientX - windowEl.offsetLeft;
+  offsetY = e.clientY - windowEl.offsetTop;
+});
+
+document.addEventListener("mousemove", (e) => {
+  if (isDragging) {
+    windowEl.style.left = `${e.clientX - offsetX}px`;
+    windowEl.style.top = `${e.clientY - offsetY}px`;
+  }
+});
+
+document.addEventListener("mouseup", () => {
+  isDragging = false;
+});
+
+bioIcon.addEventListener("dblclick", () => {
+  windowEl.style.display = "block";
+  windowEl.style.zIndex = Date.now();
+
+  if (!bioTaskbarBtn) {
+    bioTaskbarBtn = document.createElement("div");
+    bioTaskbarBtn.className = "taskbar-app active";
+    bioTaskbarBtn.textContent = "My Bio";
+    taskbarApps.appendChild(bioTaskbarBtn);
+
+    bioTaskbarBtn.addEventListener("click", () => {
+      if (windowEl.style.display === "none") {
+        windowEl.style.display = "block";
+        windowEl.style.zIndex = Date.now();
+        bioTaskbarBtn.classList.add("active");
+      } else {
+        windowEl.style.display = "none";
+        bioTaskbarBtn.classList.remove("active");
+      }
     });
+  } else {
+    bioTaskbarBtn.classList.add("active");
+  }
+});
 
-    // Close and minimize buttons
-    windows.forEach(win => {
-        const closeBtn = win.querySelector(".close");
-        const minimizeBtn = win.querySelector(".minimize");
-        const windowId = win.id;
+closeBtn.addEventListener("click", () => {
+  windowEl.style.display = "none";
+  if (bioTaskbarBtn) {
+    bioTaskbarBtn.remove();
+    bioTaskbarBtn = null;
+  }
+});
 
-        if (closeBtn) {
-            closeBtn.addEventListener("click", () => {
-                win.style.display = "none";
-                if (taskbarButtons[windowId]) {
-                    taskbarButtons[windowId].remove();
-                    delete taskbarButtons[windowId];
-                }
-            });
-        }
+minimizeBtn.addEventListener("click", () => {
+  windowEl.style.display = "none";
+  if (bioTaskbarBtn) bioTaskbarBtn.classList.remove("active");
+});
 
-        if (minimizeBtn) {
-            minimizeBtn.addEventListener("click", () => {
-                win.style.display = "none";
-            });
-        }
+windowEl.style.display = "none";
 
-        // Make windows draggable
-        const titleBar = win.querySelector(".title-bar");
-        let isDragging = false;
-        let offsetX = 0;
-        let offsetY = 0;
+startBtn.addEventListener("click", () => {
+  const isVisible = !startMenu.classList.contains("hidden");
+  document.querySelectorAll("#start-menu").forEach(menu => menu.classList.add("hidden"));
+  if (!isVisible) startMenu.classList.remove("hidden");
+})
 
-        titleBar.addEventListener("mousedown", e => {
-            isDragging = true;
-            offsetX = e.clientX - win.offsetLeft;
-            offsetY = e.clientY - win.offsetTop;
-            win.style.zIndex = 1000;
-        });
-
-        document.addEventListener("mousemove", e => {
-            if (isDragging) {
-                win.style.left = `${e.clientX - offsetX}px`;
-                win.style.top = `${e.clientY - offsetY}px`;
-            }
-        });
-
-        document.addEventListener("mouseup", () => {
-            isDragging = false;
-        });
-    });
-
-    // Start menu toggle
-    if (startButton && startMenu) {
-        startButton.addEventListener("click", () => {
-            startMenu.style.display = startMenu.style.display === "block" ? "none" : "block";
-        });
-
-        document.addEventListener("click", (e) => {
-            if (!startButton.contains(e.target) && !startMenu.contains(e.target)) {
-                startMenu.style.display = "none";
-            }
-        });
-    }
-
-    // Music player
-    const audio = document.getElementById("music-audio");
-    const playBtn = document.getElementById("play-music");
-    const pauseBtn = document.getElementById("pause-music");
-    const nextBtn = document.getElementById("next-music");
-    const prevBtn = document.getElementById("prev-music");
-    const songTitle = document.getElementById("song-title");
-
-    const playlist = [
-        { title: "Track 1 - Cool Vibes", src: "music/song1.mp3" },
-        { title: "Track 2 - Dreamy Tune", src: "music/song2.mp3" },
-        { title: "Track 3 - Y2K Jam", src: "music/song3.mp3" }
-    ];
-
-    let currentTrack = 0;
-
-    function loadTrack(index) {
-        const track = playlist[index];
-        audio.src = track.src;
-        songTitle.textContent = track.title;
-    }
-
-    if (audio) {
-        loadTrack(currentTrack);
-
-        audio.addEventListener("ended", () => {
-            currentTrack = (currentTrack + 1) % playlist.length;
-            loadTrack(currentTrack);
-            audio.play();
-        });
-
-        if (playBtn) playBtn.addEventListener("click", () => audio.play());
-        if (pauseBtn) pauseBtn.addEventListener("click", () => audio.pause());
-        if (nextBtn) nextBtn.addEventListener("click", () => {
-            currentTrack = (currentTrack + 1) % playlist.length;
-            loadTrack(currentTrack);
-            audio.play();
-        });
-        if (prevBtn) prevBtn.addEventListener("click", () => {
-            currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
-            loadTrack(currentTrack);
-            audio.play();
-        });
-    }
+document.addEventListener("click", (e) => {
+  if (!startBtn.contains(e.target) && !startMenu.contains(e.target)) {
+    startMenu.classList.add("hidden");
+  }
 });
