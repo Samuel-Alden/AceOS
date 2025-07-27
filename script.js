@@ -1,25 +1,72 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const windows = document.querySelectorAll(".window");
+ldocument.addEventListener("DOMContentLoaded", () => {
     const icons = document.querySelectorAll(".desktop-icon");
+    const windows = document.querySelectorAll(".window");
     const taskbar = document.getElementById("taskbar");
-    const taskbarClock = document.getElementById("taskbar-clock");
+    const clock = document.getElementById("taskbar-clock");
     const startButton = document.getElementById("start-button");
     const startMenu = document.getElementById("start-menu");
     const taskbarButtons = {};
 
-    // 🕒 Update Clock
+    // Update clock every second
     function updateClock() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        taskbarClock.textContent = timeString;
+        clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
-    updateClock();
     setInterval(updateClock, 1000);
+    updateClock();
 
-    // 🪟 Make Windows Draggable
+    // Open windows when icon is double clicked
+    icons.forEach(icon => {
+        icon.addEventListener("dblclick", () => {
+            const windowId = icon.id.replace("-icon", "-window");
+            const win = document.getElementById(windowId);
+            if (win) {
+                win.style.display = "block";
+                win.style.zIndex = 1000;
+
+                if (!taskbarButtons[windowId]) {
+                    const btn = document.createElement("button");
+                    btn.className = "taskbar-app-button";
+                    btn.textContent = win.querySelector(".title").textContent;
+
+                    btn.addEventListener("click", () => {
+                        win.style.display = win.style.display === "none" ? "block" : "none";
+                    });
+
+                    taskbar.insertBefore(btn, clock);
+                    taskbarButtons[windowId] = btn;
+                }
+            }
+        });
+    });
+
+    // Close and minimize buttons
     windows.forEach(win => {
-        const titleBar = win.querySelector('.title-bar');
-        let offsetX, offsetY, isDragging = false;
+        const closeBtn = win.querySelector(".close");
+        const minimizeBtn = win.querySelector(".minimize");
+        const windowId = win.id;
+
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => {
+                win.style.display = "none";
+                if (taskbarButtons[windowId]) {
+                    taskbarButtons[windowId].remove();
+                    delete taskbarButtons[windowId];
+                }
+            });
+        }
+
+        if (minimizeBtn) {
+            minimizeBtn.addEventListener("click", () => {
+                win.style.display = "none";
+            });
+        }
+
+        // Make windows draggable
+        const titleBar = win.querySelector(".title-bar");
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
 
         titleBar.addEventListener("mousedown", e => {
             isDragging = true;
@@ -40,55 +87,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 📂 Desktop Icons to Open Windows
-    icons.forEach(icon => {
-        icon.addEventListener("dblclick", () => {
-            const windowId = icon.id.replace("-icon", "-window");
-            const win = document.getElementById(windowId);
-            if (win) {
-                win.style.display = "block";
-                win.style.zIndex = 1000;
+    // Start menu toggle
+    if (startButton && startMenu) {
+        startButton.addEventListener("click", () => {
+            startMenu.style.display = startMenu.style.display === "block" ? "none" : "block";
+        });
 
-                if (!taskbarButtons[windowId]) {
-                    const btn = document.createElement("button");
-                    btn.className = "taskbar-app-button";
-                    btn.textContent = win.querySelector(".title").textContent;
-
-                    btn.addEventListener("click", () => {
-                        win.style.display = win.style.display === "none" ? "block" : "none";
-                    });
-
-                    taskbar.insertBefore(btn, taskbarClock);
-                    taskbarButtons[windowId] = btn;
-                }
+        document.addEventListener("click", (e) => {
+            if (!startButton.contains(e.target) && !startMenu.contains(e.target)) {
+                startMenu.style.display = "none";
             }
         });
-    });
+    }
 
-    // ❌ Close & ➖ Minimize Windows
-    windows.forEach(win => {
-        const closeBtn = win.querySelector(".close");
-        const minBtn = win.querySelector(".minimize");
-        const windowId = win.id;
-
-        if (closeBtn) {
-            closeBtn.addEventListener("click", () => {
-                win.style.display = "none";
-                if (taskbarButtons[windowId]) {
-                    taskbarButtons[windowId].remove();
-                    delete taskbarButtons[windowId];
-                }
-            });
-        }
-
-        if (minBtn) {
-            minBtn.addEventListener("click", () => {
-                win.style.display = "none";
-            });
-        }
-    });
-
-    // 🎵 Music Player Logic
+    // Music player
     const audio = document.getElementById("music-audio");
     const playBtn = document.getElementById("play-music");
     const pauseBtn = document.getElementById("pause-music");
@@ -105,10 +117,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentTrack = 0;
 
     function loadTrack(index) {
-        if (!audio) return;
         const track = playlist[index];
         audio.src = track.src;
-        if (songTitle) songTitle.textContent = track.title;
+        songTitle.textContent = track.title;
     }
 
     if (audio) {
@@ -131,19 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
             currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
             loadTrack(currentTrack);
             audio.play();
-        });
-    }
-
-    // 🟦 Start Menu Toggle
-    if (startButton && startMenu) {
-        startButton.addEventListener("click", () => {
-            startMenu.style.display = startMenu.style.display === "block" ? "none" : "block";
-        });
-
-        document.addEventListener("click", (e) => {
-            if (!startButton.contains(e.target) && !startMenu.contains(e.target)) {
-                startMenu.style.display = "none";
-            }
         });
     }
 });
