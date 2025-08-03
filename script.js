@@ -1,240 +1,275 @@
-// ====== BIO WINDOW ======
-const windowEl = document.getElementById("bio-window");
-const titleBar = windowEl.querySelector(".title-bar");
-const closeBtn = windowEl.querySelector(".close");
-const minimizeBtn = windowEl.querySelector(".minimize");
-const bioIcon = document.getElementById("bio-icon");
-
-const startButton = document.getElementById('start-button');
-const startMenu = document.getElementById('start-menu');
-
-const clockEl = document.getElementById("taskbar-clock");
-const taskbarApps = document.getElementById("taskbar-apps");
-
-let bioTaskbarBtn = null;
-
-function updateClock() {
-  const now = new Date();
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  clockEl.textContent = `${hours}:${minutes}`;
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-let isDragging = false;
-let offsetX = 0;
-let offsetY = 0;
-
-titleBar.addEventListener("mousedown", (e) => {
-  isDragging = true;
-  offsetX = e.clientX - windowEl.offsetLeft;
-  offsetY = e.clientY - windowEl.offsetTop;
-});
-
-document.addEventListener("mousemove", (e) => {
-  if (isDragging) {
-    windowEl.style.left = `${e.clientX - offsetX}px`;
-    windowEl.style.top = `${e.clientY - offsetY}px`;
-  }
-});
-
-document.addEventListener("mouseup", () => {
-  isDragging = false;
-});
-
-bioIcon.addEventListener("dblclick", () => {
-  windowEl.style.display = "block";
-  windowEl.style.zIndex = Date.now();
-
-  if (!bioTaskbarBtn) {
-    bioTaskbarBtn = document.createElement("div");
-    bioTaskbarBtn.className = "taskbar-app active";
-    bioTaskbarBtn.textContent = "My Bio";
-    taskbarApps.appendChild(bioTaskbarBtn);
-
-    bioTaskbarBtn.addEventListener("click", () => {
-      if (windowEl.style.display === "none") {
-        windowEl.style.display = "block";
-        windowEl.style.zIndex = Date.now();
-        bioTaskbarBtn.classList.add("active");
-      } else {
-        windowEl.style.display = "none";
-        bioTaskbarBtn.classList.remove("active");
-      }
-    });
-  } else {
-    bioTaskbarBtn.classList.add("active");
-  }
-});
-
-closeBtn.addEventListener("click", () => {
-  windowEl.style.display = "none";
-  if (bioTaskbarBtn) {
-    bioTaskbarBtn.remove();
-    bioTaskbarBtn = null;
-  }
-});
-
-minimizeBtn.addEventListener("click", () => {
-  windowEl.style.display = "none";
-  if (bioTaskbarBtn) bioTaskbarBtn.classList.remove("active");
-});
-
-windowEl.style.display = "none";
-
-// ====== START MENU ======
-startButton.addEventListener('click', () => {
-  startMenu.classList.toggle('hidden');
-});
-
-document.addEventListener('click', (e) => {
-  if (!startMenu.contains(e.target) && e.target !== startButton) {
-    startMenu.classList.add('hidden');
-  }
-});
-
-// ====== MUSIC PLAYER WINDOW ======
-const musicWindow = document.getElementById("music-window");
-const musicTitleBar = musicWindow.querySelector(".title-bar");
-const musicCloseBtn = musicWindow.querySelector(".close");
-const musicMinimizeBtn = musicWindow.querySelector(".minimize");
-let musicTaskbarBtn = null;
-
-const audio = document.getElementById("music-audio");
-const playBtn = document.getElementById("play-music");
-const pauseBtn = document.getElementById("pause-music");
-const nextBtn = document.getElementById("next-music");
-const prevBtn = document.getElementById("prev-music");
-const songTitle = document.getElementById("song-title");
-
-const playlist = [
-  { title: "HUNTRIX - GOLDEN", src: "audio/HUNTRIX - GOLDEN.mp3" },
-];
-
-let currentTrack = 0;
-
-function loadTrack(index) {
-  const track = playlist[index];
-  audio.src = track.src;
-  songTitle.textContent = track.title;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-loadTrack(currentTrack);
+body, html {
+    margin: 0;
+    font-family: 'Press Start 2P', 'MS Sans Serif', sans-serif;
+    background: linear-gradient(135deg, #d3d3f7, #fbefff); /* Y2K pastel vibes */
+    color: #000;
+    overflow: hidden;
+    user-select: none;
+    cursor: default;
+}
 
-audio.addEventListener("ended", () => {
-  currentTrack = (currentTrack + 1) % playlist.length;
-  loadTrack(currentTrack);
-  audio.play();
-});
+#desktop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 40px;
+  background-image: url('images/retro-wallpaper.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 16px;
+}
 
-if (playBtn) playBtn.addEventListener("click", () => audio.play());
-if (pauseBtn) pauseBtn.addEventListener("click", () => audio.pause());
-if (nextBtn) nextBtn.addEventListener("click", () => {
-  currentTrack = (currentTrack + 1) % playlist.length;
-  loadTrack(currentTrack);
-  audio.play();
-});
-if (prevBtn) prevBtn.addEventListener("click", () => {
-  currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
-  loadTrack(currentTrack);
-  audio.play();
-});
+.window.active .title-bar {
+  background-color: #000080;
+  color: white;
+}
 
-// Drag music window
-let isDraggingMusic = false;
-let musicOffsetX = 0;
-let musicOffsetY = 0;
+.window.inactive .title-bar {
+  background-color: #808080;
+  color: #ccc;
+}
 
-musicTitleBar.addEventListener("mousedown", (e) => {
-  isDraggingMusic = true;
-  musicOffsetX = e.clientX - musicWindow.offsetLeft;
-  musicOffsetY = e.clientY - musicWindow.offsetTop;
-});
+.window {
+  position: absolute;
+  width: 300px;
+  background-color: #e0e0e0;
+  border: 2px solid #808080;
+  box-shadow: 3px 3px #999;
+  font-family: 'MS Sans Serif', sans-serif;
+  z-index: 50;
+}
 
-document.addEventListener("mousemove", (e) => {
-  if (isDraggingMusic) {
-    musicWindow.style.left = `${e.clientX - musicOffsetX}px`;
-    musicWindow.style.top = `${e.clientY - musicOffsetY}px`;
-  }
-});
+#notepad-window textarea {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  background-color: #fffff0;
+  border: 1px inset #999;
+  resize: none;
+}
 
-document.addEventListener("mouseup", () => {
-  isDraggingMusic = false;
-});
+#notepad-window button {
+  font-family: 'MS Sans Serif', sans-serif;
+  padding: 2px 8px;
+  font-size: 12px;
+  border: 1px outset #ccc;
+  background-color: #e0e0e0;
+  cursor: pointer;
+}
 
-// Taskbar logic
-const mediaIcon = document.getElementById("media-icon");
-mediaIcon.addEventListener("dblclick", () => {
-  musicWindow.style.display = "block";
-  musicWindow.style.zIndex = Date.now();
+.title-bar {
+  background-color: #000080;
+  color: white;
+  padding: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
 
-  if (!musicTaskbarBtn) {
-    musicTaskbarBtn = document.createElement("div");
-    musicTaskbarBtn.className = "taskbar-app active";
-    musicTaskbarBtn.textContent = "Music";
-    taskbarApps.appendChild(musicTaskbarBtn);
+.window-buttons button {
+  background-color: #c0c0c0;
+  border: 1px outset white;
+  margin-left: 2px;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
 
-    musicTaskbarBtn.addEventListener("click", () => {
-      if (musicWindow.style.display === "none") {
-        musicWindow.style.display = "block";
-        musicWindow.style.zIndex = Date.now();
-        musicTaskbarBtn.classList.add("active");
-      } else {
-        musicWindow.style.display = "none";
-        musicTaskbarBtn.classList.remove("active");
-      }
-    });
-  } else {
-    musicTaskbarBtn.classList.add("active");
-  }
-});
+.window-content {
+  padding: 10px;
+  background-color: #f5f5f5;
+}
 
-musicCloseBtn.addEventListener("click", () => {
-  musicWindow.style.display = "none";
-  audio.pause(); // 🚨 stop the audio
-  audio.currentTime = 0; // ⏮️ rewind to start (optional)
+audio {
+  width: 100%;
+  margin-top: 8px;
+  filter: contrast(120%) brightness(90%);
+}
 
-  if (musicTaskbarBtn) {
-    musicTaskbarBtn.remove();
-    musicTaskbarBtn = null;
-  }
-});
+.desktop-icon {
+  width: 72px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
 
-musicMinimizeBtn.addEventListener("click", () => {
-  musicWindow.style.display = "none";
-  if (musicTaskbarBtn) musicTaskbarBtn.classList.remove("active");
-});
+.desktop-icon img {
+  width: 48px;
+  height: 48px;
+}
 
-musicWindow.style.display = "none";
+.desktop-icon span {
+  font-size: 10px;
+  margin-top: 4px;
+  display: block;
+  color: white;
+  text-shadow: 1px 1px black;
+}
 
-// Start menu → Music Player
-const startMusicBtn = document.getElementById("start-music-btn");
+.desktop-icon:hover span {
+  background-color: rgba(0, 120, 215, 0.4);
+  border: 1px dotted white;
+}
 
-if (startMusicBtn) {
-  startMusicBtn.addEventListener("click", () => {
-    musicWindow.style.display = "block";
-    musicWindow.style.zIndex = Date.now();
-    startMenu.classList.add("hidden"); // hide start menu after click
+#taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 40px;
+    width: 100%;
+    background: linear-gradient(#c0c0c0, #808080);
+    border-top: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    font-size: 14px;
+    font-family: 'Verdana', sans-serif;
+    z-index: 100;
+}
 
-    if (!musicTaskbarBtn) {
-      musicTaskbarBtn = document.createElement("div");
-      musicTaskbarBtn.className = "taskbar-app active";
-      musicTaskbarBtn.textContent = "Music";
-      taskbarApps.appendChild(musicTaskbarBtn);
+#start-button {
+  background-color: silver;
+  border: 2px outset white;
+  padding: 4px 12px;
+  font-weight: bold;
+  font-family: 'Press Start 2P', 'MS Sans Serif', sans-serif;
+  cursor: pointer;
+}
 
-      musicTaskbarBtn.addEventListener("click", () => {
-        if (musicWindow.style.display === "none") {
-          musicWindow.style.display = "block";
-          musicWindow.style.zIndex = Date.now();
-          musicTaskbarBtn.classList.add("active");
-        } else {
-          musicWindow.style.display = "none";
-          musicTaskbarBtn.classList.remove("active");
-        }
-      });
-    } else {
-      musicTaskbarBtn.classList.add("active");
-    }
-  });
+#start-button:hover {
+    background: linear-gradient(#d0d0d0, #a0a0a0);
+}
+
+#taskbar-clock {
+    background: #000;
+    color: #0f0;
+    padding: 4px 8px;
+    font-family: monospace;
+    border: 2px inset #444;
+}
+
+#taskbar-apps {
+    display: flex;
+    flex-grow: 1;
+    padding: 0 10px;
+    align-items: center;
+}
+
+.taskbar-app {
+  padding: 4px 8px;
+  background-color: #c0c0c0;
+  border: 2px outset white;
+  margin-right: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: 'MS Sans Serif', sans-serif;
+}
+
+.taskbar-app:hover {
+  background-color: #a0a0a0;
+  border: 2px inset #fff;
+}
+
+.taskbar-app.active {
+    background: #a0a0a0;
+    border-style: inset;
+}
+
+#start-menu {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  width: 200px;
+  background-color: #e0e0e0;
+  border: 2px outset white;
+  font-size: 12px;
+  font-family: 'MS Sans Serif', sans-serif;
+  box-shadow: 2px 2px 0 gray;
+  z-index: 100;
+}
+
+#start-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#start-menu li {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+}
+
+#start-menu li:hover {
+  background-color: #000080;
+  color: white;
+}
+
+.hidden {
+    display: none;
+}
+
+#paint-window .window-content {
+  padding: 10px;
+}
+
+#paintCanvas {
+  display: block;
+  margin-top: 8px;
+  border: 1px solid black;
+  background-color: white;
+}
+
+#paint-window button,
+#paint-window input[type="color"] {
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 12px;
+  padding: 2px 6px;
+  border: 2px outset #ccc;
+  background-color: #e0e0e0;
+  color: black;
+  margin-right: 4px;
+}
+
+#paint-window {
+  width: 440px;
+  height: auto;
+}
+
+button {
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 12px;
+  padding: 2px 6px;
+  background-color: #e0e0e0;
+  border: 2px outset #fff;
+  color: black;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #dcdcdc;
+}
+
+button:active {
+  border: 2px inset #aaa;
+  background-color: #c0c0c0;
+}
+
+input[type="color"] {
+  border: 2px solid #999;
+  padding: 1px;
+  cursor: pointer;
 }
