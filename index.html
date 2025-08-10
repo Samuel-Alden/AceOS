@@ -8,6 +8,41 @@
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     </head>
     <body>
+
+        <div id="desktop">
+        <div id="boot-screen">
+  <div class="boot-content">
+    <h1>AldenOS 2000</h1>
+    <div class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
+    <p>Starting up...</p>
+    <audio id="startup-sound" src="sounds/startup.mp3"></audio>
+  </div>
+</div>
+</div>
+
+<div id="desktop">
+<div id="helper" style="display: none;">
+  <div id="helper-img">🤖</div>
+  <div id="helper-bubble">Hi there! Need some help?</div>
+</div>
+</div>
+
+<div class="window inactive" id="welcome-window" style="display: none;">
+  <div class="title-bar">
+    <span class="title">Welcome</span>
+    <div class="window-buttons">
+      <button class="close">x</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <p>Welcome to <b>AldenOS 2000</b>!</p>
+    <p>Click the Start menu to explore the apps and have fun.</p>
+    <button id="welcome-ok">OK</button>
+  </div>
+</div>
+
         <div id="desktop">
           <div class="desktop-icon" id="paint-icon">
   <h1>🎨</h1>
