@@ -436,4 +436,126 @@ if (startMusicBtn) {
       musicTaskbarBtn.classList.add("active");
     }
   });
+
+  window.addEventListener("load", () => {
+  const bootScreen = document.getElementById("boot-screen");
+  const progressBar = document.querySelector(".loading-progress");
+  const startupSound = document.getElementById("startup-sound");
+
+  let progress = 0;
+  const loadingInterval = setInterval(() => {
+    progress += 5;
+    progressBar.style.width = progress + "%";
+
+    if (progress >= 100) {
+      clearInterval(loadingInterval);
+      setTimeout(() => {
+        startupSound.play();
+        bootScreen.classList.add("fade-out");
+
+        setTimeout(() => {
+  bootScreen.classList.add("fade-out");
+
+  // Show Welcome Window
+  const welcomeWindow = document.getElementById("welcome-window");
+  welcomeWindow.style.display = "block";
+  bringToFront(welcomeWindow);
+
+  // Close when clicking OK or the X button
+  document.getElementById("welcome-ok").addEventListener("click", () => {
+    welcomeWindow.style.display = "none";
+  });
+  welcomeWindow.querySelector(".close").addEventListener("click", () => {
+    welcomeWindow.style.display = "none";
+  });
+
+}, 500);
+      }, 500);
+    }
+  }, 150);
+});
+
+let idleTimer;
+const helper = document.getElementById("helper");
+const helperBubble = document.getElementById("helper-bubble");
+
+const helperMessages = [
+  "Hi there! Need some help?",
+  "It looks like you're exploring AldenOS!",
+  "Tip: Click the Start menu to find cool stuff.",
+  "Remember to save your work... oh wait, this is fake.",
+  "I'm here if you need me!"
+];
+
+// Reset idle timer on any activity
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  helper.style.display = "none";
+  document.removeEventListener("mousemove", moveHelper); // stop tracking when hidden
+  idleTimer = setTimeout(showHelper, 20000);
+}
+
+function showHelper() {
+  const randomMsg = helperMessages[Math.floor(Math.random() * helperMessages.length)];
+  helperBubble.textContent = randomMsg;
+
+  const helperWidth = helper.offsetWidth;
+  const helperHeight = helper.offsetHeight;
+  const padding = 10;
+
+  let posX = lastMouseX + padding;
+  let posY = lastMouseY + padding;
+
+  if (posX + helperWidth > window.innerWidth) {
+    posX = lastMouseX - helperWidth - padding;
+  }
+  if (posY + helperHeight > window.innerHeight) {
+    posY = lastMouseY - helperHeight - padding;
+  }
+
+  helper.style.left = posX + "px";
+  helper.style.top = posY + "px";
+
+  helper.style.display = "flex";
+
+  document.addEventListener("mousemove", moveHelper);
+}
+
+function moveHelper(e) {
+  const helperWidth = helper.offsetWidth;
+  const helperHeight = helper.offsetHeight;
+  const padding = 10; // gap from cursor
+
+  let posX = e.pageX + padding;
+  let posY = e.pageY + padding;
+
+  // Flip horizontally if too close to right edge
+  if (posX + helperWidth > window.innerWidth) {
+    posX = e.pageX - helperWidth - padding;
+  }
+
+  // Flip vertically if too close to bottom edge
+  if (posY + helperHeight > window.innerHeight) {
+    posY = e.pageY - helperHeight - padding;
+  }
+
+  helper.style.left = posX + "px";
+  helper.style.top = posY + "px";
+}
+
+// Watch for user activity
+["mousemove", "keydown", "click"].forEach(evt => {
+  document.addEventListener(evt, resetIdleTimer);
+});
+
+// Start the timer initially
+resetIdleTimer();
+
+let lastMouseX = 0;
+let lastMouseY = 0;
+
+document.addEventListener("mousemove", (e) => {
+  lastMouseX = e.pageX;
+  lastMouseY = e.pageY;
+});
 }
